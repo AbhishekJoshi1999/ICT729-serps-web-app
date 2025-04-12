@@ -1,0 +1,42 @@
+/* src/styles/main.css */
+:root {
+    --primary: #2c5eff;
+    --primary-light: #e6ecff;
+    --secondary: #ff6b35;
+    --dark: #1a1a1a;
+    --gray: #808080;
+    --light-gray: #e6e6e6;
+    --white: #ffffff;
+    --error: #ff3b30;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark);
+  }
+  
+  /* Shared dashboard styles */
+  .dashboard {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+  
+  .dashboard-content {
+    padding: 2rem;
+    background-color: #f9f9f9;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .dashboard {
+      grid-template-columns: 1fr;
+    }
+  }
