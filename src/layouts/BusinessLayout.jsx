@@ -1,7 +1,7 @@
 // src/layouts/BusinessLayout.jsx
 import React from 'react';
 import { Box } from '@mui/material';
-import Sidebar from '/src/components/business/Sidebar';
+import Sidebar from '/src/components/business/sidebar';
 import Header from '/src/components/business/Header';
 import { Outlet } from 'react-router-dom';
 
