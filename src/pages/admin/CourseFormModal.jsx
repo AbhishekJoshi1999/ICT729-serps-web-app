@@ -17,7 +17,6 @@ const CourseFormModal = ({ open, handleClose, course, refresh }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Fetch users to populate Head of Department dropdown
     const fetchUsers = async () => {
       try {
         const res = await axios.get('/users?role=teacher');
@@ -32,8 +31,8 @@ const CourseFormModal = ({ open, handleClose, course, refresh }) => {
   useEffect(() => {
     if (isEdit) {
       setFormData({
-        courseName: course.courseName || '',
-        headOfDepartment: course.headOfDepartment || '',
+        courseName: course.name || '',
+        headOfDepartment: course.headOfDepartment?._id || '',
         totalCredits: course.totalCredits || ''
       });
     } else {
@@ -55,10 +54,16 @@ const CourseFormModal = ({ open, handleClose, course, refresh }) => {
 
   const handleSubmit = async () => {
     try {
+      const payload = {
+        name: formData.courseName,
+        headOfDepartment: formData.headOfDepartment,
+        totalCredits: Number(formData.totalCredits)
+      };
+
       if (isEdit) {
-        await axios.put(`/courses/${course._id}`, formData);
+        await axios.put(`/course/${course._id}`, payload);
       } else {
-        await axios.post('/courses/createCourse', formData);
+        await axios.post('/course/createCourse', payload);
       }
       refresh();
       handleClose();
@@ -94,15 +99,16 @@ const CourseFormModal = ({ open, handleClose, course, refresh }) => {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              select
               label="Head of Department"
               name="headOfDepartment"
-              select
               fullWidth
               value={formData.headOfDepartment}
               onChange={handleChange}
+              sx={{ minWidth: '300px' }}
             >
               {users.map((user) => (
-                <MenuItem key={user._id} value={user.fullName}>
+                <MenuItem key={user._id} value={user._id}>
                   {user.fullName}
                 </MenuItem>
               ))}

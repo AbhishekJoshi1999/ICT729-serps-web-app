@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Button, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextField
+  Box, Button, Typography, Table, TableBody, TableCell, TableHead, TableRow, Paper
 } from '@mui/material';
 import CourseFormModal from './CourseFormModal';
 import axios from '../../utils/axios';
@@ -9,18 +9,33 @@ const CourseManagement = () => {
   const [courses, setCourses] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [userMap, setUserMap] = useState({});
 
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('/courses');
-      setCourses(res.data);
+      const res = await axios.get('/course/getAllCourse');
+      setCourses(res.data.data || []);
     } catch (err) {
       console.error('Error fetching courses:', err);
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get('/users/findAllTeachers'); // Replace with your actual users API path
+      const map = {};
+      res.data.data.forEach(user => {
+        map[user._id] = user.fullName;
+      });
+      setUserMap(map);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  };
+
   useEffect(() => {
     fetchCourses();
+    fetchUsers();
   }, []);
 
   const handleEdit = (course) => {
@@ -35,14 +50,10 @@ const CourseManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/courses/${id}`);
+      await axios.delete(`/course/${id}`);
       fetchCourses();
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        alert(err.response.data.message);
-      } else {
-        alert('Error deleting course');
-      }
+      alert(err.response?.data?.message || 'Failed to delete course');
     }
   };
 
@@ -65,15 +76,21 @@ const CourseManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {courses.map((course, idx) => (
+            {courses.map((course, index) => (
               <TableRow key={course._id}>
-                <TableCell>{idx + 1}</TableCell>
-                <TableCell>{course.courseName}</TableCell>
-                <TableCell>{course.headOfDepartment}</TableCell>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{course.name}</TableCell>
+                <TableCell>{userMap[course.headOfDepartment] || 'N/A'}</TableCell>
                 <TableCell>{course.totalCredits}</TableCell>
                 <TableCell>
                   <Button variant="outlined" size="small" onClick={() => handleEdit(course)}>Edit</Button>
-                  <Button variant="contained" size="small" color="error" onClick={() => handleDelete(course._id)} sx={{ ml: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    sx={{ ml: 1 }}
+                    onClick={() => handleDelete(course._id)}
+                  >
                     Delete
                   </Button>
                 </TableCell>

@@ -10,6 +10,8 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminLayout from './layouts/AdminLayout';
 import AdminUserManagement from './pages/admin/AdminUserManagement';
 import CourseManagement from './pages/admin/CourseManagement';
+import UnitManagement from './pages/admin/UnitManagement';
+import ClassManagement from './pages/admin/ClassManagement';
 
 import TeacherDashboard from './pages/teacher/Dashboard';
 
@@ -37,6 +39,8 @@ const AppRoutes = () => {
       <Route path="dashboard" element={<AdminDashboard />} />
       <Route path="/admin/users" element={<AdminUserManagement/>} />
       <Route path="/admin/courses" element={<CourseManagement />} />
+      <Route path="/admin/units" element={<UnitManagement />} />
+      <Route path="/admin/classes" element={<ClassManagement />} />
       {/* Add more nested admin pages later */}
       </Route>
     

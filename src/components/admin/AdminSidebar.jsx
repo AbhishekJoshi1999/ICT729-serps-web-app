@@ -1,18 +1,31 @@
-// src/components/admin/AdminSidebar.jsx
-import React from 'react';
-import { Drawer, List, ListItemButton, ListItemText, Toolbar, Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  Collapse,
+  Toolbar,
+  Box,
+  Typography
+} from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const links = [
-    { label: 'Dashboard', path: '/admin/dashboard' },
-    { label: 'User Management', path: '/admin/users' },
-    { label: 'Course Management', path: '/admin/courses' },
-    { label: 'Configuration', path: '/admin/configuration' },
-    { label: 'Settings', path: '/admin/settings' }
-  ];
+  const [openCourse, setOpenCourse] = useState(
+    location.pathname.startsWith('/admin/courses') ||
+    location.pathname.startsWith('/admin/units') ||
+    location.pathname.startsWith('/admin/classes')
+  );
+
+  const handleCourseToggle = () => {
+    setOpenCourse(true); // Always open submenu
+    navigate('/admin/courses'); // Default route
+  };
 
   return (
     <Drawer
@@ -23,7 +36,7 @@ const AdminSidebar = () => {
         '& .MuiDrawer-paper': {
           width: 220,
           boxSizing: 'border-box',
-          borderRight: '1px solid #ddd'
+          borderRight: '1px solid #ddd',
         },
       }}
     >
@@ -34,12 +47,43 @@ const AdminSidebar = () => {
           </Typography>
         </Box>
       </Toolbar>
+
       <List>
-        {links.map((link) => (
-          <ListItemButton key={link.path} onClick={() => navigate(link.path)}>
-            <ListItemText primary={link.label} />
-          </ListItemButton>
-        ))}
+        <ListItemButton onClick={() => navigate('/admin/dashboard')}>
+          <ListItemText primary="Dashboard" />
+        </ListItemButton>
+
+        <ListItemButton onClick={() => navigate('/admin/users')}>
+          <ListItemText primary="User Management" />
+        </ListItemButton>
+
+        {/* Course Management */}
+        <ListItemButton onClick={handleCourseToggle}>
+          <ListItemText primary="Course Management" />
+          {openCourse ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+
+        <Collapse in={openCourse} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/admin/courses')}>
+              <ListItemText primary="Course" />
+            </ListItemButton>
+            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/admin/units')}>
+              <ListItemText primary="Unit" />
+            </ListItemButton>
+            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/admin/classes')}>
+              <ListItemText primary="Class" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => navigate('/admin/configuration')}>
+          <ListItemText primary="Configuration" />
+        </ListItemButton>
+
+        <ListItemButton onClick={() => navigate('/admin/settings')}>
+          <ListItemText primary="Settings" />
+        </ListItemButton>
       </List>
     </Drawer>
   );
