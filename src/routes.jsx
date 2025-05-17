@@ -13,7 +13,13 @@ import CourseManagement from './pages/admin/CourseManagement';
 import UnitManagement from './pages/admin/UnitManagement';
 import ClassManagement from './pages/admin/ClassManagement';
 
-import TeacherDashboard from './pages/teacher/Dashboard';
+import TeacherDashboard from './pages/teacher/TeacherDashboard';
+import TeacherLayout from './layouts/TeacherLayout';
+import Assignment from './pages/teacher/Assignment';
+// import UploadPage from './pages/teacher/UploadPage';
+// import ReportsPage from './pages/teacher/ReportsPage';
+// import SettingsPage from './pages/teacher/SettingsPage';
+// import NotificationsPage from './pages/teacher/NotificationsPage';
 
 import StudentDashboard from './pages/student/Dashboard';
 
@@ -34,18 +40,25 @@ const AppRoutes = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-     {/* Admin Routes */}
+      {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
-      <Route path="dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/users" element={<AdminUserManagement/>} />
-      <Route path="/admin/courses" element={<CourseManagement />} />
-      <Route path="/admin/units" element={<UnitManagement />} />
-      <Route path="/admin/classes" element={<ClassManagement />} />
-      {/* Add more nested admin pages later */}
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUserManagement />} />
+        <Route path="/admin/courses" element={<CourseManagement />} />
+        <Route path="/admin/units" element={<UnitManagement />} />
+        <Route path="/admin/classes" element={<ClassManagement />} />
+        {/* Add more nested admin pages later */}
       </Route>
-    
+
       <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
-        <Route path="/teacher/*" element={<TeacherDashboard />} />
+        <Route path="/teacher" element={<TeacherLayout />}>
+          <Route path="dashboard" element={<TeacherDashboard />} />
+           <Route path="/teacher/assignments" element={<Assignment />} />
+         {/* <Route path="upload" element={<UploadPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} /> */}
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
