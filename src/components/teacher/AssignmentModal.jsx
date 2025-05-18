@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   Box,
@@ -7,7 +7,8 @@ import {
   Button,
   MenuItem,
 } from '@mui/material';
-import { createAssignment } from '../../services/assignmentService';
+import { createAssignment, updateAssignment } from '../../services/assignmentService';
+import axios from '../../utils/axios';
 
 const style = {
   position: 'absolute',
@@ -19,7 +20,7 @@ const style = {
   p: 4,
 };
 
-const AssignmentModal = ({ open, onClose }) => {
+const AssignmentModal = ({ open, onClose, onAssignmentCreated, assignment, isEdit }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,6 +30,58 @@ const AssignmentModal = ({ open, onClose }) => {
     deadline: '',
     maxMarks: '',
   });
+
+  const [classes, setClasses] = useState([]);
+  const [units, setUnits] = useState([]);
+
+  // Pre-fill form in edit mode
+  useEffect(() => {
+    if (isEdit && assignment) {
+      setFormData({
+        title: assignment.title || '',
+        description: assignment.description || '',
+        unitId: assignment.unitId?._id || assignment.unitId || '',
+        classId: assignment.classId?._id || assignment.classId || '',
+        startDay: assignment.startDay?.slice(0, 10) || '',
+        deadline: assignment.deadline?.slice(0, 10) || '',
+        maxMarks: assignment.maxMarks || '',
+      });
+    } else {
+      resetForm();
+    }
+  }, [assignment, isEdit]);
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      unitId: '',
+      classId: '',
+      startDay: '',
+      deadline: '',
+      maxMarks: '',
+    });
+  };
+
+  // Fetch dropdowns
+  useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        const [classRes, unitRes] = await Promise.all([
+          axios.get('/class/getAllClass'),
+          axios.get('/unit/getAllUnits'),
+        ]);
+        setClasses(classRes.data.data || []);
+        setUnits(unitRes.data.data || []);
+      } catch (err) {
+        console.error('❌ Failed to load dropdown data:', err.response?.data || err.message);
+      }
+    };
+
+    if (open) {
+      fetchDropdownData();
+    }
+  }, [open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,19 +93,29 @@ const AssignmentModal = ({ open, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      await createAssignment(formData);
-      onClose();
-      // Optionally: trigger refresh from parent via prop callback
+      if (isEdit) {
+        await updateAssignment(assignment._id, formData);
+      } else {
+        await createAssignment(formData);
+      }
+
+      if (onAssignmentCreated) onAssignmentCreated();
+      handleClose();
     } catch (err) {
-      console.error('Create error:', err);
+      console.error('❌ Submit failed:', err.response?.data || err.message);
     }
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <Typography variant="h6" gutterBottom>
-          Create New Assignment
+          {isEdit ? 'Edit Assignment' : 'Create New Assignment'}
         </Typography>
 
         <TextField
@@ -80,8 +143,11 @@ const AssignmentModal = ({ open, onClose }) => {
           value={formData.unitId}
           onChange={handleChange}
         >
-          <MenuItem value="67de5e07aca91336882210a5">Data Structures</MenuItem>
-          <MenuItem value="67de5e07aca91336882210a6">Machine Learning</MenuItem>
+          {units.map((unit) => (
+            <MenuItem key={unit._id} value={unit._id}>
+              {unit.name}
+            </MenuItem>
+          ))}
         </TextField>
         <TextField
           select
@@ -92,8 +158,11 @@ const AssignmentModal = ({ open, onClose }) => {
           value={formData.classId}
           onChange={handleChange}
         >
-          <MenuItem value="67e69d4fa04bd75a9068d818">Class_Data_Structures</MenuItem>
-          <MenuItem value="67e69d81a04bd75a9068d829">Class_Machine_Learning</MenuItem>
+          {classes.map((cls) => (
+            <MenuItem key={cls._id} value={cls._id}>
+              {cls.className}
+            </MenuItem>
+          ))}
         </TextField>
         <TextField
           label="Start Date"
@@ -126,7 +195,7 @@ const AssignmentModal = ({ open, onClose }) => {
         />
 
         <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
-          Submit
+          {isEdit ? 'Update' : 'Submit'}
         </Button>
       </Box>
     </Modal>

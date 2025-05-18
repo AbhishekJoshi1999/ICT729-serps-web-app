@@ -15,11 +15,14 @@ import ClassManagement from './pages/admin/ClassManagement';
 
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import TeacherLayout from './layouts/TeacherLayout';
-import Assignment from './pages/teacher/Assignment';
-// import UploadPage from './pages/teacher/UploadPage';
-// import ReportsPage from './pages/teacher/ReportsPage';
-// import SettingsPage from './pages/teacher/SettingsPage';
-// import NotificationsPage from './pages/teacher/NotificationsPage';
+import CreateAssignment from './pages/teacher/CreateAssignment';
+import AssignmentTracker from './pages/teacher/AssignmentTracker';
+import GradeAssignment from './pages/teacher/GradeAssignment';
+import ListResource from './pages/teacher/ListResource'; 
+import Attendance from './pages/teacher/Attendance';
+import Report from './pages/teacher/Report';
+import TeacherSettings from './pages/teacher/TeacherSettings';
+import TeacherNotifications from './pages/teacher/TeacherNotifications';
 
 import StudentDashboard from './pages/student/Dashboard';
 
@@ -50,16 +53,17 @@ const AppRoutes = () => {
         {/* Add more nested admin pages later */}
       </Route>
 
-      <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
         <Route path="/teacher" element={<TeacherLayout />}>
           <Route path="dashboard" element={<TeacherDashboard />} />
-           <Route path="/teacher/assignments" element={<Assignment />} />
-         {/* <Route path="upload" element={<UploadPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="notifications" element={<NotificationsPage />} /> */}
+          <Route path="assignments/create" element={<CreateAssignment />} />
+          <Route path="assignments/track" element={<AssignmentTracker />} />
+          <Route path="assignments/grade" element={<GradeAssignment />} />
+          <Route path="upload/resources" element={<ListResource />} />
+          <Route path="upload/attendance" element={<Attendance />} />
+          <Route path="report" element={<Report />} />
+          <Route path="settings" element={<TeacherSettings />} />
+          <Route path="notifications" element={<TeacherNotifications />} />
         </Route>
-      </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
         <Route path="/student/*" element={<StudentDashboard />} />

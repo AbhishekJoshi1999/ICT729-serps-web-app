@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
 
-const AssignmentList = ({ assignments }) => {
+const AssignmentList = ({ assignments, onView, onEdit, onDelete }) => {
   return (
     <Paper sx={{ mt: 3 }}>
       <Table>
@@ -31,13 +31,13 @@ const AssignmentList = ({ assignments }) => {
               <TableCell>{new Date(assignment.startDay).toLocaleDateString()}</TableCell>
               <TableCell>{new Date(assignment.deadline).toLocaleDateString()}</TableCell>
               <TableCell>
-                <IconButton onClick={() => console.log('View', assignment._id)}>
+                <IconButton onClick={() => onView(assignment)}>
                   <Visibility />
                 </IconButton>
-                <IconButton onClick={() => console.log('Edit', assignment._id)}>
+                <IconButton onClick={() => onEdit(assignment)}>
                   <Edit />
                 </IconButton>
-                <IconButton onClick={() => console.log('Delete', assignment._id)}>
+                <IconButton onClick={() => onDelete(assignment._id)}>
                   <Delete />
                 </IconButton>
               </TableCell>

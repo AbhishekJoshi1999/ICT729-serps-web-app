@@ -22,16 +22,14 @@ const TeacherDashboard = () => {
 
   return (
     <Box p={3}>
-      {/* Page Title */}
-      <Typography variant="h5" mb={3}>Dashboard</Typography>
 
-      {/* Filters */}
+      {/* Filters
       <FiltersBar
         year={filters.year}
         semester={filters.semester}
         unit={filters.unit}
         onChange={handleFilterChange}
-      />
+      /> */}
 
       {/* Stats Cards */}
       <Grid container spacing={2} mt={2}>
