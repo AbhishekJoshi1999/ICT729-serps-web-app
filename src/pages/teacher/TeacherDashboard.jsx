@@ -6,7 +6,7 @@ import {
   Typography,
   TextField
 } from '@mui/material';
-import FiltersBar from '../../components/teacher/FiltersBar';
+// import FiltersBar from '../../components/teacher/FiltersBar';
 
 
 const TeacherDashboard = () => {
