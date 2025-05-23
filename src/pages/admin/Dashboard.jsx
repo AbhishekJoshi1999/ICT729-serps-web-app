@@ -1,5 +1,11 @@
 // src/pages/admin/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+
 import {
   Box,
   Typography,
@@ -24,6 +30,10 @@ const AdminDashboard = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [riskData, setRiskData] = useState([]);
   const [students, setStudents] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState('');
+  const [messageText, setMessageText] = useState('');
+
 
   useEffect(() => {
     fetchAttendance();
@@ -57,13 +67,31 @@ const AdminDashboard = () => {
       console.error('Failed to fetch students:', err);
     }
   };
+  const handleExportReport = async () => {
+    try {
+      const response = await axios.get('/admin/export-report', {
+        params: { year, semester, course },
+        responseType: 'blob', // Important for file downloads
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `report_${course}_${year}_${semester}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
+  };
+
 
   return (
     <Box p={3}>
       <Typography variant="h5" mb={3}>Dashboard</Typography>
 
       {/* Filters */}
-      <Grid container spacing={2} mb={3}>
+      {/* <Grid container spacing={2} mb={3}>
         <Grid item>
           <FormControl fullWidth>
             <InputLabel>Year</InputLabel>
@@ -91,7 +119,7 @@ const AdminDashboard = () => {
             </Select>
           </FormControl>
         </Grid>
-      </Grid>
+      </Grid>*/}
 
       <Grid container spacing={3}>
         {/* Attendance Graph */}
@@ -128,7 +156,7 @@ const AdminDashboard = () => {
 
       {/* Export and Table */}
       <Box mt={4}>
-        <Button variant="contained" sx={{ mb: 2 }}>Export Report</Button>
+        <Button variant="contained" sx={{ mb: 2 }} onClick={handleExportReport} >Export Report</Button>
         <Paper>
           <Box p={2}>
             <Typography variant="h6" mb={2}>Students</Typography>
@@ -151,7 +179,19 @@ const AdminDashboard = () => {
                     <td>{s.email}</td>
                     <td>{s.attendance || '-'}</td>
                     <td>{s.risk || '-'}</td>
-                    <td><Button variant="contained" size="small">Message</Button></td>
+                    <td>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                          setSelectedEmail(s.email);
+                          setOpenModal(true);
+                        }}
+                      >
+                        Message
+                      </Button>
+                    </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -159,6 +199,35 @@ const AdminDashboard = () => {
           </Box>
         </Paper>
       </Box>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Send Message to {selectedEmail}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Your Message"
+            multiline
+            rows={5}
+            fullWidth
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            placeholder="Type your message here..."
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)} variant="outlined">Cancel</Button>
+          <Button
+            onClick={() => {
+              console.log(`Message to ${selectedEmail}:`, messageText); // simulate send
+              alert('Message sent!');
+              setOpenModal(false);
+              setMessageText('');
+            }}
+            variant="contained"
+          >
+            Send
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
